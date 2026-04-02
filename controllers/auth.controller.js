@@ -71,27 +71,21 @@ exports.verifyOtp = async (req, res) => {
       type: "sign-up",
     });
   }
-  const admins = [
-    "vishal.singh@jaiinfoway.com",
-    "addy@jaiinfoway.com",
-    "jai@jaiinfoway.com",
-  ];
+  const admins = ["bs08081997@gmail.com"];
   const token = jwt.sign(
     { email, role: admins.includes(email) ? "admin" : "user" },
     JWT_SECRET,
     { expiresIn: "7d" },
   );
 
-  res
-    .status(200)
-    .send({
-      success: true,
-      message: "OTP verified",
-      token: token,
-      username: user.username,
-      email,
-      role: admins.includes(email) ? "admin" : "user",
-    });
+  res.status(200).send({
+    success: true,
+    message: "OTP verified",
+    token: token,
+    username: user.username,
+    email,
+    role: admins.includes(email) ? "admin" : "user",
+  });
 };
 
 // 1. Get Google Auth URL
