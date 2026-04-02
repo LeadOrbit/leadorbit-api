@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gradient-to-br from-gray-100 to-gray-300 min-h-screen flex items-center justify-center">
+    <div class="bg-white shadow-lg rounded-lg p-8 max-w-sm w-full">
+      <!-- Error message container -->
+      <div id="error-message" class="hidden mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+        <span id="error-text">Invalid username or password</span>
+      </div>
+
+      <h2 class="text-2xl font-bold text-gray-800 text-center">Login</h2>
+
+      <form id="login-form" action="/api/v1/auth/login" method="POST" class="mt-6">
+        <div>
+          <label class="block text-gray-700 font-medium" for="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            class="w-full mt-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter your username"
+            required
+          />
+        </div>
+
+        <div class="mt-4">
+          <label class="block text-gray-700 font-medium" for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="w-full mt-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter your password"
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="w-full mt-6 p-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 hover:scale-105 transform transition-all duration-300"
+        >
+          Login
+        </button>
+      </form>
+    </div>
+
+    <script>
+      // Handle form submission and display error if needed
+      document.getElementById('login-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const form = event.target;
+        const formData = new FormData(form);
+        const username = formData.get('username');
+        const password = formData.get('password');
+
+        try {
+          const response = await fetch('/api/v1/auth/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, password }),
+          });
+
+          if (response.ok || response.redirected) {
+            // If the response is OK or redirected, let the browser handle the redirect
+            window.location.href = response.url || '/dashboard';
+          } else {
+            // Handle error response
+            const data = await response.json();
+            document.getElementById('error-message').classList.remove('hidden');
+            document.getElementById('error-text').innerText = data.message || 'Invalid username or password';
+            setTimeout(() => {
+              document.getElementById('error-message').classList.add('hidden');
+            }, 3000);
+          }
+        } catch (error) {
+          console.error('Error logging in:', error);
+          document.getElementById('error-message').classList.remove('hidden');
+          document.getElementById('error-text').innerText = 'An error occurred. Please try again.';
+          setTimeout(() => {
+            document.getElementById('error-message').classList.add('hidden');
+          }, 3000);
+        }
+      });
+    </script>
+  </body>
+</html>

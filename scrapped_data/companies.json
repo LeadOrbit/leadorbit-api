@@ -1,0 +1,62 @@
+[
+  {
+    "company_name": "Pardes Biosciences",
+    "company_link": "https://www.ycombinator.com/companies/pardes-bio",
+    "company_website": "http://www.pardesbio.com",
+    "company_domain": "pardesbio.com"
+  },
+  {
+    "company_name": "Bear Flag Robotics",
+    "company_link": "https://www.ycombinator.com/companies/bear-flag-robotics",
+    "company_website": "http://bearflagrobotics.com/",
+    "company_domain": "bearflagrobotics.com"
+  },
+  {
+    "company_name": "ShipBob",
+    "company_link": "https://www.ycombinator.com/companies/shipbob",
+    "company_website": "http://shipbob.com",
+    "company_domain": "shipbob.com"
+  },
+  {
+    "company_name": "iSono Health",
+    "company_link": "https://www.ycombinator.com/companies/isono-health",
+    "company_website": "http://www.isonohealth.com",
+    "company_domain": "isonohealth.com"
+  },
+  {
+    "company_name": "Stealth Worker",
+    "company_link": "https://www.ycombinator.com/companies/stealth-worker",
+    "company_website": "https://www.stealthworker.com",
+    "company_domain": "stealthworker.com"
+  },
+  {
+    "company_name": "HER",
+    "company_link": "https://www.ycombinator.com/companies/her",
+    "company_website": "http://weareher.com",
+    "company_domain": "weareher.com"
+  },
+  {
+    "company_name": "Shred Video",
+    "company_link": "https://www.ycombinator.com/companies/shred-video",
+    "company_website": "https://shredvideo.com",
+    "company_domain": "shredvideo.com"
+  },
+  {
+    "company_name": "Shape (ShapeScale)",
+    "company_link": "https://www.ycombinator.com/companies/shape-shapescale",
+    "company_website": "https://shapescale.com",
+    "company_domain": "shapescale.com"
+  },
+  {
+    "company_name": "MicroHealth",
+    "company_link": "https://www.ycombinator.com/companies/microhealth",
+    "company_website": "http://microhealth.com",
+    "company_domain": "microhealth.com"
+  },
+  {
+    "company_name": "Markhor",
+    "company_link": "https://www.ycombinator.com/companies/markhor",
+    "company_website": "http://markhor.com",
+    "company_domain": "markhor.com"
+  }
+]

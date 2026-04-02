@@ -1,0 +1,34 @@
+# Node.js specific
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Environment files
+.env
+
+# Ignore user data folder (puppeteer session data)
+config/user_data/
+config/user_data.zip
+# Logs
+*.log
+
+# MacOS specific
+.DS_Store
+
+# Windows specific
+Thumbs.db
+
+# IDE files (VSCode, WebStorm, etc.)
+.vscode/
+.idea/
+
+# Build output
+/dist/
+/build/
+
+# Package lock files
+package-lock.json
+yarn.lock
+
+# Other custom or sensitive files (add more if needed)

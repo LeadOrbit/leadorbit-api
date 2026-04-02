@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen flex">
+    <!-- Sidebar - Starts closed with -translate-x-full -->
+    <div
+      id="sidebar"
+      class="bg-white w-64 shadow-lg fixed h-full transform -translate-x-full transition-all duration-300 ease-in-out"
+    >
+      <div class="p-6 flex justify-between items-center">
+        <h2 class="text-2xl font-bold text-gray-800">Dashboard</h2>
+        <button
+          id="close-sidebar"
+          class="text-gray-600 hover:text-gray-800 focus:outline-none"
+        >
+          ✕
+        </button>
+      </div>
+      <nav class="mt-6">
+        <a
+          href="#"
+          class="block py-3 px-6 text-gray-700 bg-blue-600 hover:text-white transition-colors duration-200"
+          >Email Logs</a
+        >
+        <a
+          href="/unsubscribedUsers"
+          class="block py-3 px-6 text-gray-700 hover:bg-blue-600 hover:text-white transition-colors duration-200"
+          >Unsubscribed Users</a
+        >
+        <a
+          href="/logout"
+          class="block py-3 px-6 text-gray-700 hover:bg-blue-600 hover:text-white transition-colors duration-200 mt-4 border-t"
+          >Logout</a
+        >
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div
+      id="main-content"
+      class="flex-1 p-8 transition-all duration-300 ease-in-out"
+    >
+      <header
+        class="bg-white shadow-md rounded-lg p-6 flex justify-between items-center"
+      >
+        <div class="flex items-center">
+          <button
+            id="toggle-sidebar"
+            class="text-gray-600 hover:text-gray-800 focus:outline-none mr-4"
+          >
+            ☰
+          </button>
+          <h1 class="text-3xl font-bold text-gray-800">
+            Welcome to Our Automation Web
+          </h1>
+        </div>
+        <div class="flex items-center space-x-4">
+          <span class="text-gray-600">User Name</span>
+          <div
+            class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold"
+          >
+            UN
+          </div>
+        </div>
+      </header>
+
+      <!-- Dashboard Content -->
+      <div id="email-logs" class="mt-8 bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Email Logs</h3>
+
+        <!-- Filters and Stats Section -->
+        <div class="flex justify-between items-center mb-4">
+          <div class="flex space-x-4">
+            <input
+              id="filter-sender"
+              type="text"
+              placeholder="Filter by Sender"
+              class="border rounded p-2 focus:ring focus:ring-blue-300"
+            />
+            <input
+              id="filter-email"
+              type="text"
+              placeholder="Filter by Email ID"
+              class="border rounded p-2 focus:ring focus:ring-blue-300"
+            />
+            <input
+              id="filter-subject"
+              type="text"
+              placeholder="Filter by Subject"
+              class="border rounded p-2 focus:ring focus:ring-blue-300"
+            />
+            <select
+              id="filter-automation-name"
+              class="border rounded p-2 focus:ring focus:ring-blue-300"
+            ></select>
+            <button
+              id="apply-filters"
+              class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+            >
+              Apply Filters
+            </button>
+            <button
+              id="reset-filters"
+              class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+            >
+              Reset Filters
+            </button>
+          </div>
+          <div id="stats" class="text-sm text-gray-700"></div>
+        </div>
+
+        <div class="overflow-x-auto relative">
+          <div
+            id="table-loader"
+            class="hidden absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10"
+          >
+            <div
+              class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"
+            ></div>
+          </div>
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr
+                class="bg-gray-200 text-gray-700 uppercase text-sm leading-normal"
+              >
+                <th class="px-6 py-3 border-b-2 border-gray-300">
+                  Automation Name
+                </th>
+                <th class="px-6 py-3 border-b-2 border-gray-300">Email ID</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300">Sender</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300">Subject</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300">Delivered</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300">
+                  Delivered On
+                </th>
+                <th class="px-6 py-3 border-b-2 border-gray-300">Opened On</th>
+                <th class="px-6 py-3 border-b-2 border-gray-300">Clicks</th>
+              </tr>
+            </thead>
+            <tbody id="email-logs-table" class="text-gray-700 text-sm"></tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="flex justify-between items-center mt-4">
+          <button
+            id="prev-page"
+            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+          >
+            Previous
+          </button>
+          <div id="pagination-info" class="text-sm text-gray-700"></div>
+          <button
+            id="next-page"
+            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const sidebar = document.getElementById("sidebar");
+      const toggleSidebarBtn = document.getElementById("toggle-sidebar");
+      const closeSidebarBtn = document.getElementById("close-sidebar");
+      const mainContent = document.getElementById("main-content");
+
+      let isSidebarOpen = false; // Starts closed
+
+      function toggleSidebar() {
+        if (isSidebarOpen) {
+          sidebar.classList.add("-translate-x-full");
+          mainContent.classList.remove("ml-64");
+        } else {
+          sidebar.classList.remove("-translate-x-full");
+          mainContent.classList.add("ml-64");
+        }
+        isSidebarOpen = !isSidebarOpen;
+      }
+
+      // Initialize sidebar state on page load
+      document.addEventListener("DOMContentLoaded", () => {
+        // If you want the sidebar to start open instead, change to:
+        // isSidebarOpen = true;
+        // sidebar.classList.remove("-translate-x-full");
+        // mainContent.classList.add("ml-64");
+      });
+
+      toggleSidebarBtn.addEventListener("click", toggleSidebar);
+      closeSidebarBtn.addEventListener("click", toggleSidebar);
+
+      let currentPage = 1;
+      let totalPages = 1;
+
+      async function fetchAutomationNames() {
+        const response = await fetch("/api/v1/auth/get_all_automation");
+        const { automationNames } = await response.json();
+
+        const dropdown = document.getElementById("filter-automation-name");
+        dropdown.innerHTML =
+          '<option value="">Filter by Automation Name</option>';
+
+        automationNames.forEach((name) => {
+          const option = document.createElement("option");
+          option.value = name;
+          option.textContent = name;
+          dropdown.appendChild(option);
+        });
+      }
+
+      async function fetchEmailLogs(filters = {}) {
+        filters.page = currentPage;
+        const loader = document.getElementById("table-loader");
+        try {
+          loader.classList.remove("hidden");
+          const queryString = new URLSearchParams(filters).toString();
+          const response = await fetch(
+            `/api/v1/auth/email-logs?${queryString}`
+          );
+          const response_data = await response.json();
+          if (response_data && response_data.redirect) {
+            window.location.href = response_data.redirect;
+            return;
+          }
+          const { emailLogs, stats, pagination } = response_data;
+
+          totalPages = pagination.totalPages;
+
+          const statsContainer = document.getElementById("stats");
+          statsContainer.innerHTML = `
+          <div class="grid grid-cols-3 gap-4">
+            <div class="bg-white p-4 shadow rounded-lg text-center">
+              <h4 class="text-lg font-bold text-gray-700">Delivered</h4>
+              <p class="text-2xl text-blue-600">${stats.total_email_delivered}</p>
+            </div>
+            <div class="bg-white p-4 shadow rounded-lg text-center">
+              <h4 class="text-lg font-bold text-gray-700">Opened</h4>
+              <p class="text-2xl text-blue-600">${stats.total_email_opened}</p>
+            </div>
+            <div class="bg-white p-4 shadow rounded-lg text-center">
+              <h4 class="text-lg font-bold text-gray-700">No of Clicks</h4>
+              <p class="text-2xl text-blue-600">${stats.total_website_visited}</p>
+            </div>
+          </div>
+        `;
+
+          const tableBody = document.getElementById("email-logs-table");
+          tableBody.innerHTML = "";
+
+          emailLogs.forEach((log) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+            <td class="border px-6 py-3">${log.automation_name}</td>
+            <td class="border px-6 py-3">${log.email_id}</td>
+            <td class="border px-6 py-3">${log.sender}</td>
+            <td class="border px-6 py-3">${log.subject}</td>
+            <td class="border px-6 py-3">${
+              log.email_delivered ? "Yes" : "No"
+            }</td>
+            <td class="border px-6 py-3">  ${
+              log.createdAt ? new Date(log.createdAt).toLocaleString() : "N/A"
+            }</td>
+            <td class="border px-6 py-3">${
+              log.email_oppened_on
+                ? new Date(log.email_oppened_on).toLocaleString()
+                : "N/A"
+            }</td>
+            <td class="border px-6 py-3">${log.clicked}</td>
+          `;
+            tableBody.appendChild(row);
+          });
+
+          document.getElementById(
+            "pagination-info"
+          ).innerText = `Page ${currentPage} of ${totalPages}`;
+        } catch (error) {
+          alert(error);
+          return;
+        } finally {
+          loader.classList.add("hidden");
+        }
+      }
+
+      document.getElementById("apply-filters").addEventListener("click", () => {
+        currentPage = 1; // Reset to first page when applying new filters
+        const sender = document.getElementById("filter-sender").value;
+        const subject = document.getElementById("filter-subject").value;
+        const email_id = document.getElementById("filter-email").value;
+        const automation_name = document.getElementById(
+          "filter-automation-name"
+        ).value;
+
+        fetchEmailLogs({ sender, subject, automation_name, email_id });
+      });
+
+      document.getElementById("reset-filters").addEventListener("click", () => {
+        currentPage = 1; // Reset to first page when resetting filters
+
+        // Clear all filter inputs
+        document.getElementById("filter-sender").value = "";
+        document.getElementById("filter-subject").value = "";
+        document.getElementById("filter-email").value = "";
+        document.getElementById("filter-automation-name").value = "";
+
+        // Fetch all logs without any filters
+        fetchEmailLogs();
+      });
+
+      document.getElementById("prev-page").addEventListener("click", () => {
+        const prevPageButton = document.getElementById("prev-page");
+        const sender = document.getElementById("filter-sender").value;
+        const subject = document.getElementById("filter-subject").value;
+        const automation_name = document.getElementById(
+          "filter-automation-name"
+        ).value;
+        const email_id = document.getElementById("filter-email").value;
+        if (currentPage > 1) {
+          try {
+            // Disable the button while fetching
+            prevPageButton.disabled = true;
+            currentPage--;
+            fetchEmailLogs({ sender, subject, automation_name, email_id });
+          } catch (error) {
+            console.error("Error fetching logs:", error);
+          } finally {
+            // Re-enable the button when done (whether success or error)
+            prevPageButton.disabled = false;
+          }
+        }
+      });
+
+      document
+        .getElementById("next-page")
+        .addEventListener("click", async () => {
+          const nextPageButton = document.getElementById("next-page");
+          const sender = document.getElementById("filter-sender").value;
+          const subject = document.getElementById("filter-subject").value;
+          const automation_name = document.getElementById(
+            "filter-automation-name"
+          ).value;
+          const email_id = document.getElementById("filter-email").value;
+          if (currentPage < totalPages) {
+            try {
+              // Disable the button while fetching
+              nextPageButton.disabled = true;
+              currentPage++;
+              await fetchEmailLogs({
+                sender,
+                subject,
+                automation_name,
+                email_id,
+              });
+            } catch (error) {
+              console.error("Error fetching logs:", error);
+            } finally {
+              // Re-enable the button when done (whether success or error)
+              nextPageButton.disabled = false;
+            }
+          }
+        });
+
+      // Initialize the page
+      fetchAutomationNames();
+      fetchEmailLogs();
+    </script>
+  </body>
+</html>

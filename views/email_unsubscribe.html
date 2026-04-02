@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Unsubscribe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body
+    class="bg-gradient-to-br from-gray-100 to-gray-300 min-h-screen flex items-center justify-center"
+  >
+    <div
+      class="bg-white p-10 rounded-2xl shadow-lg max-w-lg text-center border border-gray-200"
+    >
+      <div class="flex justify-center mb-4">
+        <svg
+          class="w-16 h-16 text-red-500 animate-bounce"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M12 14v2m0-10v4m0 6h.01M5 13l4 4m6-4l4 4M5 9l4-4m6 4l4-4"
+          ></path>
+        </svg>
+      </div>
+      <h2 class="text-3xl font-extrabold text-red-600">
+        Unsubscribe from Emails
+      </h2>
+      <p class="mt-4 text-gray-700 text-lg">
+        Please select a reason for unsubscribing:
+      </p>
+
+      <form class="mt-6" id="unsubscribeForm">
+        <select
+          id="reason"
+          name="reason"
+          class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+          onchange="toggleOtherInput()"
+          required
+        >
+          <option value="" disabled selected>Select a reason</option>
+          <option value="too_many_emails">Too many emails</option>
+          <option value="not_relevant">Content not relevant</option>
+          <option value="other">Other (please specify)</option>
+        </select>
+
+        <input
+          type="text"
+          id="otherReason"
+          name="otherReason"
+          class="w-full mt-4 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 hidden"
+          placeholder="Please specify your reason"
+        />
+
+        <button
+          type="submit"
+          class="w-full mt-6 p-3 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 hover:scale-105 transform transition-all duration-300"
+        >
+          Unsubscribe
+        </button>
+      </form>
+
+      <p id="message" class="mt-4 text-gray-700 hidden"></p>
+    </div>
+
+    <script>
+      function toggleOtherInput() {
+        const reasonSelect = document.getElementById("reason");
+        const otherInput = document.getElementById("otherReason");
+
+        if (reasonSelect.value === "other") {
+          otherInput.classList.remove("hidden");
+          otherInput.setAttribute("required", "true");
+        } else {
+          otherInput.classList.add("hidden");
+          otherInput.removeAttribute("required");
+        }
+      }
+
+      function getUid() {
+        const pathSegments = window.location.pathname.split("/"); // Split the URL path into segments
+        const uidIndex = pathSegments.indexOf("Account") + 1; // The UID comes right after 'Account'
+
+        return pathSegments[uidIndex] || ""; // Return the UID or an empty string if not found
+      }
+
+      document
+        .getElementById("unsubscribeForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+          const uid = getUid();
+          if (!uid) {
+            alert("Invalid unsubscribe link. Please try again.");
+            return;
+          }
+          let reason = document.getElementById("reason").value;
+          let otherReason = document.getElementById("otherReason").value;
+
+          if (reason === "other") {
+            reason = otherReason.trim();
+          }
+
+          if (!reason) {
+            alert("Please select or enter a reason.");
+            return;
+          }
+
+          try {
+            let response = await fetch("/api/v1/unsubscribe", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ reason, uid }),
+            });
+
+            let data = await response.json();
+
+            const message = document.getElementById("message");
+            if (data.success) {
+              window.location.href = data.redirect;
+            } else {
+              message.textContent = "Failed to unsubscribe. Please try again.";
+              message.classList.remove("hidden", "text-green-600");
+              message.classList.add("text-red-600");
+            }
+          } catch (error) {
+            console.error("Error unsubscribing:", error);
+            const message = document.getElementById("message");
+            message.textContent = "An error occurred. Please try again later.";
+            message.classList.remove("hidden", "text-green-600");
+            message.classList.add("text-red-600");
+          }
+        });
+    </script>
+  </body>
+</html>
