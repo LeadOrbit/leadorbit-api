@@ -1,49 +1,13 @@
-// require('dotenv').config();
-// const { generateToken } = require('../lib/jwt.js');
-
-// exports.login = async (req, res, next) => {
-//   try {
-//     const { username, password } = req.body;
-//     const loginUsername = process.env.LOGIN_USERNAME;
-//     const loginPassword = process.env.LOGIN_PASSWORD;
-
-//     // Validate credentials
-//     if (username !== loginUsername || password !== loginPassword) {
-//       return res.status(401).json({
-//         success: false,
-//         message: "Invalid username or password",
-//       });
-//     }
-
-//     // Generate a JWT token
-//     const token = generateToken({ username });
-//     console.log('Generated JWT Token:', token); // Log the token for debugging
-
-//     // Set the token in a cookie
-//     res.cookie('authToken', token, {
-//       httpOnly: true,
-//       secure: process.env.NODE_ENV === 'production',
-//       maxAge: 6 * 60 * 60 * 1000, // 6 hours
-//     });
-
-//     // Redirect to /dashboard
-//     return res.redirect('/dashboard');
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
 const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
 const { google } = require("googleapis");
 const sendEmail = require("../utils/mailSender");
 const db = require("../models");
 
-
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI
+  process.env.GOOGLE_REDIRECT_URI,
 );
 
 // In-memory store for OTPs and users
@@ -57,8 +21,9 @@ const OTP_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
 const generateOTP = () => uuidv4().slice(0, 6).toUpperCase(); // e.g. "A1B2C3"
 
 exports.sendOtp = async (req, res) => {
-  const { username = '', email } = req.body;
-  if (!email) return res.status(400).json({ success: false, error: "Email is required" });
+  const { username = "", email } = req.body;
+  if (!email)
+    return res.status(400).json({ success: false, error: "Email is required" });
 
   const otp = generateOTP();
   otpStore.set(email, {
@@ -70,9 +35,11 @@ exports.sendOtp = async (req, res) => {
   console.log(`OTP for ${email}: ${otp}`);
 
   await sendEmail({
-    to: email, subject: "Email Verification", html: `<p>Hello ${username || ""},</p>
+    to: email,
+    subject: "Email Verification",
+    html: `<p>Hello ${username || ""},</p>
 <p>Your OTP is <strong>${otp}</strong>. It will expire in 5 minutes.</p>`,
-  })
+  });
 
   res.json({ success: true, message: "OTP sent successfully" });
 };
@@ -82,15 +49,17 @@ exports.verifyOtp = async (req, res) => {
   const record = otpStore.get(email);
 
   if (!record || record.otp !== otp || record.expiresAt < Date.now()) {
-    return res.status(400).json({ success: false, error: "Invalid or expired OTP" });
+    return res
+      .status(400)
+      .json({ success: false, error: "Invalid or expired OTP" });
   }
 
   otpStore.delete(email); // Remove used OTP
 
   let user = await db.User.findOne({
     where: {
-      email
-    }
+      email,
+    },
   });
 
   // Register the user if new
@@ -99,19 +68,31 @@ exports.verifyOtp = async (req, res) => {
     await db.Notification.create({
       userId: user.id,
       message: `Welcome to AutoFlow.Thanks for Signing up with us.`,
-      type: 'sign-up'
+      type: "sign-up",
     });
   }
-  const admins = ["vishal.singh@jaiinfoway.com", "addy@jaiinfoway.com", "jai@jaiinfoway.com"]
-  const token = jwt.sign({ email, role: admins.includes(email) ? "admin" : "user" }, JWT_SECRET, { expiresIn: "7d" });
+  const admins = [
+    "vishal.singh@jaiinfoway.com",
+    "addy@jaiinfoway.com",
+    "jai@jaiinfoway.com",
+  ];
+  const token = jwt.sign(
+    { email, role: admins.includes(email) ? "admin" : "user" },
+    JWT_SECRET,
+    { expiresIn: "7d" },
+  );
 
-
-
-  res.status(200).send({ success: true, message: "OTP verified", token: token, username: user.username, email, role: admins.includes(email) ? "admin" : "user" });
+  res
+    .status(200)
+    .send({
+      success: true,
+      message: "OTP verified",
+      token: token,
+      username: user.username,
+      email,
+      role: admins.includes(email) ? "admin" : "user",
+    });
 };
-
-
-
 
 // 1. Get Google Auth URL
 exports.getGoogleAuthUrl = (req, res) => {
@@ -137,7 +118,7 @@ exports.googleCallback = async (req, res) => {
 
     const { email, name, picture } = userInfo;
 
-    // 👉 Here: Save user to DB if not exists 
+    // 👉 Here: Save user to DB if not exists
     let user = await db.User.findOne({ email });
     if (!user) user = await db.User.create({ email, name, picture });
 
@@ -154,14 +135,13 @@ exports.googleCallback = async (req, res) => {
   }
 };
 
-
 exports.getAllUsers = async (req, res) => {
   const { email, role } = req.user;
 
   if (role === "admin") {
     try {
       const users = await db.User.findAll({
-        attributes: ["email", "username"]
+        attributes: ["email", "username"],
       });
       res.status(200).send({ success: true, users });
     } catch (error) {
